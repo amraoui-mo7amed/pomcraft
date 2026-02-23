@@ -202,9 +202,10 @@ ApplicationWindow {
 
                 Repeater {
                     model: [
-                        { name: "Timer", icon: "⏱", page: 0 },
-                        { name: "Tasks", icon: "✓", page: 1 },
-                        { name: "Settings", icon: "⚙", page: 2 }
+                        { name: "Home", icon: "🏠", page: 0 },
+                        { name: "Timer", icon: "⏱", page: 1 },
+                        { name: "Tasks", icon: "✓", page: 2 },
+                        { name: "Settings", icon: "⚙", page: 3 }
                     ]
 
                     Rectangle {
@@ -290,6 +291,8 @@ ApplicationWindow {
             currentIndex: currentPage
             Layout.fillWidth: true
             Layout.fillHeight: true
+
+            DashboardPage {}
 
             TimerPage {
                 onSessionChanged: function(session) {
