@@ -157,8 +157,8 @@ ApplicationWindow {
             anchors.fill: parent
             z: -1
             property point lastMousePos: Qt.point(0, 0)
-            onPressed: (mouse) => lastMousePos = Qt.point(mouse.x, mouse.y)
-            onPositionChanged: (mouse) => {
+            onPressed: function(mouse) { lastMousePos = Qt.point(mouse.x, mouse.y) }
+            onPositionChanged: function(mouse) {
                 if (pressed) {
                     root.x += mouse.x - lastMousePos.x
                     root.y += mouse.y - lastMousePos.y

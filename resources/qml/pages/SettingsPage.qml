@@ -41,36 +41,36 @@ Item {
                     SettingsSlider {
                         Layout.fillWidth: true
                         label: "Work Duration"
-                        value: SettingsBackend.getWorkDuration()
+                        value: SettingsBackend.workDuration
                         from: 1
                         to: 60
                         suffix: " min"
                         onSliderValueChanged: function (newValue) {
-                            SettingsBackend.setWorkDuration(newValue);
+                            SettingsBackend.workDuration = newValue;
                         }
                     }
 
                     SettingsSlider {
                         Layout.fillWidth: true
                         label: "Short Break"
-                        value: SettingsBackend.getShortBreakDuration()
+                        value: SettingsBackend.shortBreakDuration
                         from: 1
                         to: 30
                         suffix: " min"
                         onSliderValueChanged: function (newValue) {
-                            SettingsBackend.setShortBreakDuration(newValue);
+                            SettingsBackend.shortBreakDuration = newValue;
                         }
                     }
 
                     SettingsSlider {
                         Layout.fillWidth: true
                         label: "Long Break"
-                        value: SettingsBackend.getLongBreakDuration()
+                        value: SettingsBackend.longBreakDuration
                         from: 5
                         to: 60
                         suffix: " min"
                         onSliderValueChanged: function (newValue) {
-                            SettingsBackend.setLongBreakDuration(newValue);
+                            SettingsBackend.longBreakDuration = newValue;
                         }
                     }
                 }
@@ -105,14 +105,14 @@ Item {
                             anchors.fill: parent
                             anchors.margins: Theme.spacing.md
                             verticalAlignment: TextInput.AlignVCenter
-                            text: SettingsBackend.getApiKey()
+                            text: SettingsBackend.apiKey
                             color: Theme.colors.text
                             font.pixelSize: Theme.typography.body
                             font.family: Theme.fontFamily
                             echoMode: TextInput.Password
                             selectByMouse: true
 
-                            onTextChanged: SettingsBackend.setApiKey(text)
+                            onTextChanged: SettingsBackend.apiKey = text
                         }
                     }
 
@@ -140,9 +140,9 @@ Item {
                         Layout.fillWidth: true
                         label: "Sound Effects"
                         description: "Play a sound when sessions complete"
-                        checked: SettingsBackend.getNotificationSound()
+                        checked: SettingsBackend.notificationSound
                         onToggled: function (newChecked) {
-                            SettingsBackend.setNotificationSound(newChecked);
+                            SettingsBackend.notificationSound = newChecked;
                         }
                     }
 
@@ -150,9 +150,9 @@ Item {
                         Layout.fillWidth: true
                         label: "Auto-start Breaks"
                         description: "Automatically start break timers"
-                        checked: SettingsBackend.getAutoStartBreaks()
+                        checked: SettingsBackend.autoStartBreaks
                         onToggled: function (newChecked) {
-                            SettingsBackend.setAutoStartBreaks(newChecked);
+                            SettingsBackend.autoStartBreaks = newChecked;
                         }
                     }
                 }

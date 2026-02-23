@@ -56,6 +56,7 @@ ColumnLayout {
 
         Rectangle {
             id: sliderHandle
+            property bool animationEnabled: true
             x: ((root.value - root.from) / (root.to - root.from)) * (parent.width - width)
             anchors.verticalCenter: parent.verticalCenter
             width: 20
@@ -66,6 +67,7 @@ ColumnLayout {
             border.width: 2
 
             Behavior on x {
+                enabled: sliderHandle.animationEnabled
                 NumberAnimation { duration: 50 }
             }
 
@@ -91,15 +93,32 @@ ColumnLayout {
             cursorShape: Qt.PointingHandCursor
 
             function updateValue(mouseX) {
-                const percent = Math.max(0, Math.min(1, mouseX / width))
+                const percent = Math.max(0, Math.min(1, mouseX / sliderDrag.width))
                 const newValue = root.from + (percent * (root.to - root.from))
-                root.sliderValueChanged(Math.round(newValue))
+                
+                // Real-time smooth update for the handle and label
+                root.value = newValue
+                
+                const roundedValue = Math.round(newValue)
+                // Only emit signal when integer value changes to avoid backend overload
+                if (root._lastEmittedValue !== roundedValue) {
+                    root._lastEmittedValue = roundedValue
+                    root.sliderValueChanged(roundedValue)
+                }
             }
 
-            onPressed: (mouse) => updateValue(mouse.x)
-            onPositionChanged: (mouse) => {
+            onPressed: function(mouse) { 
+                sliderHandle.animationEnabled = false
+                updateValue(mouse.x) 
+            }
+            onPositionChanged: function(mouse) {
                 if (pressed) updateValue(mouse.x)
+            }
+            onReleased: {
+                sliderHandle.animationEnabled = true
             }
         }
     }
+
+    property int _lastEmittedValue: Math.round(value)
 }
