@@ -7,9 +7,10 @@ import "pages"
 ApplicationWindow {
     id: root
     visible: true
-    width: 1280
+    visibility: Window.Windowed
+    width: 1160
     height: 720
-    minimumWidth: 1280
+    minimumWidth: 1160
     minimumHeight: 720
     title: "Pomcraft"
     color: Theme.colors.background
@@ -18,6 +19,11 @@ ApplicationWindow {
 
     property int currentPage: 0
     property bool isMaximized: false
+
+    Component.onCompleted: {
+        // Ensuring standard visibility size initially without popping into fullscreen
+        root.showNormal();
+    }
 
     FontLoader {
         id: iconFont
@@ -74,7 +80,9 @@ ApplicationWindow {
                 }
             }
 
-            Item { Layout.fillWidth: true }
+            Item {
+                Layout.fillWidth: true
+            }
 
             RowLayout {
                 spacing: Theme.spacing.xs
@@ -123,11 +131,11 @@ ApplicationWindow {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             if (root.isMaximized) {
-                                root.showNormal()
+                                root.showNormal();
                             } else {
-                                root.showMaximized()
+                                root.showMaximized();
                             }
-                            root.isMaximized = !root.isMaximized
+                            root.isMaximized = !root.isMaximized;
                         }
                     }
                 }
@@ -161,20 +169,22 @@ ApplicationWindow {
             anchors.fill: parent
             z: -1
             property point lastMousePos: Qt.point(0, 0)
-            onPressed: function(mouse) { lastMousePos = Qt.point(mouse.x, mouse.y) }
-            onPositionChanged: function(mouse) {
+            onPressed: function (mouse) {
+                lastMousePos = Qt.point(mouse.x, mouse.y);
+            }
+            onPositionChanged: function (mouse) {
                 if (pressed) {
-                    root.x += mouse.x - lastMousePos.x
-                    root.y += mouse.y - lastMousePos.y
+                    root.x += mouse.x - lastMousePos.x;
+                    root.y += mouse.y - lastMousePos.y;
                 }
             }
             onDoubleClicked: {
                 if (root.isMaximized) {
-                    root.showNormal()
+                    root.showNormal();
                 } else {
-                    root.showMaximized()
+                    root.showMaximized();
                 }
-                root.isMaximized = !root.isMaximized
+                root.isMaximized = !root.isMaximized;
             }
         }
     }
@@ -206,9 +216,21 @@ ApplicationWindow {
 
                 Repeater {
                     model: [
-                        { name: "Home", icon: Theme.icons.home, page: 0 },
-                        { name: "Projects", icon: Theme.icons.projects, page: 1 },
-                        { name: "Settings", icon: Theme.icons.settings, page: 2 }
+                        {
+                            name: "Home",
+                            icon: Theme.icons.home,
+                            page: 0
+                        },
+                        {
+                            name: "Projects",
+                            icon: Theme.icons.projects,
+                            page: 1
+                        },
+                        {
+                            name: "Settings",
+                            icon: Theme.icons.settings,
+                            page: 2
+                        }
                     ]
 
                     Rectangle {
@@ -218,7 +240,9 @@ ApplicationWindow {
                         color: currentPage === modelData.page ? Theme.colors.primary : (navBtn.containsMouse ? Theme.colors.surfaceHover : "transparent")
 
                         Behavior on color {
-                            ColorAnimation { duration: Theme.animation.fast }
+                            ColorAnimation {
+                                duration: Theme.animation.fast
+                            }
                         }
 
                         RowLayout {
@@ -242,7 +266,9 @@ ApplicationWindow {
                                 font.family: Theme.fontFamily
                             }
 
-                            Item { Layout.fillWidth: true }
+                            Item {
+                                Layout.fillWidth: true
+                            }
                         }
 
                         MouseArea {
@@ -255,7 +281,9 @@ ApplicationWindow {
                     }
                 }
 
-                Item { Layout.fillHeight: true }
+                Item {
+                    Layout.fillHeight: true
+                }
             }
         }
 

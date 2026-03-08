@@ -9,7 +9,7 @@ Item {
     property string text: ""
     property string placeholder: "No content yet. Click Edit to start writing..."
     signal contentUpdated(string newText)
-    
+
     property string mode: "preview" // "preview" or "edit"
 
     Rectangle {
@@ -29,7 +29,13 @@ Item {
                 height: 50
                 color: Theme.colors.surfaceActive
                 radius: 7
-                Rectangle { height: 20; anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right; color: parent.color }
+                Rectangle {
+                    height: 20
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    color: parent.color
+                }
 
                 RowLayout {
                     anchors.fill: parent
@@ -47,7 +53,9 @@ Item {
                         font.letterSpacing: 1.2
                     }
 
-                    Item { Layout.fillWidth: true }
+                    Item {
+                        Layout.fillWidth: true
+                    }
 
                     // Action Buttons Row
                     RowLayout {
@@ -82,7 +90,7 @@ Item {
                             label: "Copy"
                             onClicked: {
                                 if (typeof Clipboard !== 'undefined') {
-                                    Clipboard.setText(root.text)
+                                    Clipboard.setText(root.text);
                                 }
                             }
                         }
@@ -98,28 +106,31 @@ Item {
 
                 // Preview View
                 ScrollView {
+                    id: previewScroll
                     clip: true
                     Text {
-                        width: parent.width
-                        text: root.text !== "" ? root.text : "*" + root.placeholder + "*"
+                        width: previewScroll.width
+                        text: root.text !== "" ? MarkdownRenderer.render(root.text) : MarkdownRenderer.render("*" + root.placeholder + "*")
                         color: root.text !== "" ? Theme.colors.text : Theme.colors.textMuted
                         font.family: Theme.fontFamily
                         font.pixelSize: 15
                         wrapMode: Text.WordWrap
-                        textFormat: Text.MarkdownText
+                        textFormat: Text.RichText
                         leftPadding: Theme.spacing.xl
                         rightPadding: Theme.spacing.xl
                         topPadding: Theme.spacing.xl
                         bottomPadding: Theme.spacing.xl
-                        onLinkActivated: (link) => Qt.openUrlExternally(link)
+                        onLinkActivated: link => Qt.openUrlExternally(link)
                     }
                 }
 
                 // Edit View
                 ScrollView {
+                    id: editorScrollView
                     clip: true
                     TextArea {
                         id: editorArea
+                        width: editorScrollView.width
                         text: root.text
                         color: Theme.colors.text
                         font.family: "Inter"
@@ -127,24 +138,32 @@ Item {
                         wrapMode: TextEdit.Wrap
                         selectByMouse: true
                         textFormat: TextEdit.PlainText
-                        
+
+                        // Handle 4-space tab indentation
+                        Keys.onPressed: event => {
+                            if (event.key === Qt.Key_Tab) {
+                                editorArea.insert(editorArea.cursorPosition, "    ");
+                                event.accepted = true;
+                            }
+                        }
+
                         leftPadding: Theme.spacing.xl
                         rightPadding: Theme.spacing.xl
                         topPadding: Theme.spacing.xl
                         bottomPadding: Theme.spacing.xl
 
                         placeholderText: root.placeholder
-                        
+
                         Component.onCompleted: {
                             if (typeof Highlighter !== 'undefined') {
-                                Highlighter.apply(editorArea)
+                                Highlighter.apply(editorArea);
                             }
                         }
 
                         onTextChanged: {
                             if (root.text !== text) {
-                                root.text = text
-                                root.contentUpdated(text)
+                                root.text = text;
+                                root.contentUpdated(text);
                             }
                         }
                     }
@@ -156,24 +175,28 @@ Item {
     // External text sync
     onTextChanged: {
         if (editorArea.text !== text) {
-            editorArea.text = text
+            editorArea.text = text;
         }
     }
 
     // Inline Component for Toolbar Buttons
-    component ActionIcon : Rectangle {
+    component ActionIcon: Rectangle {
         id: actionButton
         property string icon: ""
         property string label: ""
         property bool active: false
-        signal clicked()
+        signal clicked
 
         width: 36
         height: 36
         radius: 7
         color: active ? Theme.colors.primary : (ma.containsMouse ? Theme.colors.surfaceHover : "transparent")
-        
-        Behavior on color { ColorAnimation { duration: 200 } }
+
+        Behavior on color {
+            ColorAnimation {
+                duration: 200
+            }
+        }
 
         Text {
             anchors.centerIn: parent

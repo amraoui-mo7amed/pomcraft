@@ -10,6 +10,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 
 from src.backend import TimerBackend, TasksBackend, SettingsBackend, ProjectsBackend
 from src.highlighter import MarkdownHighlighter
+from src.markdown_renderer import MarkdownRenderer
 
 
 def main() -> int:
@@ -28,6 +29,7 @@ def main() -> int:
     tasks_backend = TasksBackend()
     settings_backend = SettingsBackend()
     projects_backend = ProjectsBackend()
+    markdown_renderer = MarkdownRenderer()
 
     timer_backend.setWorkDuration(settings_backend.getWorkDuration())
     timer_backend.setShortBreakDuration(settings_backend.getShortBreakDuration())
@@ -37,6 +39,7 @@ def main() -> int:
     engine.rootContext().setContextProperty("TasksBackend", tasks_backend)
     engine.rootContext().setContextProperty("SettingsBackend", settings_backend)
     engine.rootContext().setContextProperty("ProjectsBackend", projects_backend)
+    engine.rootContext().setContextProperty("MarkdownRenderer", markdown_renderer)
 
     # Register helper for QML to apply syntax highlighter
     class HighlighterBridge(QObject):

@@ -42,11 +42,46 @@ class MarkdownHighlighter(QSyntaxHighlighter):
         list_fmt.setFontWeight(QFont.Weight.Bold)
         self._formats["list"] = list_fmt
 
+        # Link Format
+        link = QTextCharFormat()
+        link.setForeground(QColor("#3B82F6"))
+        link.setFontUnderline(True)
+        self._formats["link"] = link
+
+        # Blockquote Format
+        quote = QTextCharFormat()
+        quote.setForeground(QColor("#9CA3AF"))
+        quote.setFontItalic(True)
+        self._formats["quote"] = quote
+
+        # Task Format
+        task = QTextCharFormat()
+        task.setForeground(QColor("#10B981"))
+        task.setFontWeight(QFont.Weight.Bold)
+        self._formats["task"] = task
+
+        # Strikethrough Format
+        strike = QTextCharFormat()
+        strike.setForeground(QColor("#6B7280"))
+        strike.setFontStrikeOut(True)
+        self._formats["strike"] = strike
+
     def highlightBlock(self, text):
         # Apply header styling for lines starting with #
         if text.startswith("#"):
             self.setFormat(0, len(text), self._formats["header"])
             return  # Don't apply other formats to headers for clarity
+            
+        # Apply blockquote styling
+        if text.startswith(">"):
+            self.setFormat(0, len(text), self._formats["quote"])
+            return
+
+        # Apply strikethrough
+        for match in re.finditer(r"~~[^~]+~~", text):
+            self.setFormat(
+                match.start(), match.end() - match.start(), self._formats["strike"]
+            )
 
         # Apply bold: **text**
         for match in re.finditer(r"\*\*[^\*]+\*\*", text):
@@ -66,9 +101,20 @@ class MarkdownHighlighter(QSyntaxHighlighter):
                 match.start(), match.end() - match.start(), self._formats["code"]
             )
 
-        # Apply list bullet styling
+        # Apply links [text](url)
+        for match in re.finditer(r"\[([^\]]+)\]\([^\)]+\)", text):
+            self.setFormat(
+                match.start(), match.end() - match.start(), self._formats["link"]
+            )
+
+        # Apply list bullet styling and tasks
         if re.match(r"^\s*([-*+]|\d+\.)\s", text):
-            # Format just the bullet/number
-            bullet_match = re.match(r"^\s*([-*+]|\d+\.)", text)
-            if bullet_match:
-                self.setFormat(0, bullet_match.end(), self._formats["list"])
+            # Format tasks
+            task_match = re.search(r"^\s*[-*+]\s+\[[ xX]\]", text)
+            if task_match:
+                self.setFormat(0, task_match.end(), self._formats["task"])
+            else:
+                # Format just the bullet/number
+                bullet_match = re.match(r"^\s*([-*+]|\d+\.)", text)
+                if bullet_match:
+                    self.setFormat(0, bullet_match.end(), self._formats["list"])
