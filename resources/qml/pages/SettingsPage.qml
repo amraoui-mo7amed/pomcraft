@@ -31,7 +31,7 @@ Item {
 
             SettingsCard {
                 title: "Timer"
-                icon: "⏱"
+                icon: Theme.icons.timer
                 Layout.fillWidth: true
 
                 ColumnLayout {
@@ -79,8 +79,8 @@ Item {
             SettingsCard {
                 Layout.fillWidth: true
                 title: "Gemini API"
-                icon: "🤖"
-                description: "Enter your Gemini API key to enable AI-powered task generation from Markdown files."
+                icon: Theme.icons.robot
+                description: "Enter your Gemini API key to enable AI-powered insights for your projects."
 
                 ColumnLayout {
                     Layout.fillWidth: true
@@ -129,7 +129,7 @@ Item {
 
             SettingsCard {
                 title: "Notifications"
-                icon: "🔔"
+                icon: Theme.icons.bell
                 Layout.fillWidth: true
 
                 RowLayout {
@@ -160,7 +160,7 @@ Item {
 
             SettingsCard {
                 title: "About"
-                icon: "ℹ"
+                icon: Theme.icons.info
                 Layout.fillWidth: true
 
                 ColumnLayout {
@@ -183,7 +183,7 @@ Item {
                     }
 
                     Text {
-                        text: "Craft your focus. An open-source Pomodoro timer with Markdown task support and AI-powered task generation."
+                        text: "Craft your focus. A powerful project management tool designed for deep work."
                         color: Theme.colors.textMuted
                         font.pixelSize: Theme.typography.bodySmall
                         font.family: Theme.fontFamily

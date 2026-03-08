@@ -39,7 +39,9 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: root.icon
-                    font.pixelSize: 20
+                    font.pixelSize: 18
+                    font.family: Theme.iconFontFamily
+                    color: Theme.colors.primary
                 }
             }
 

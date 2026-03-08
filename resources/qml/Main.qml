@@ -7,18 +7,22 @@ import "pages"
 ApplicationWindow {
     id: root
     visible: true
-    width: 920
+    width: 1280
     height: 720
-    minimumWidth: 900
-    minimumHeight: 600
+    minimumWidth: 1280
+    minimumHeight: 720
     title: "Pomcraft"
     color: Theme.colors.background
 
     flags: Qt.Window | Qt.FramelessWindowHint
 
     property int currentPage: 0
-    property string currentSession: "work"
     property bool isMaximized: false
+
+    FontLoader {
+        id: iconFont
+        source: "../fonts/FontAwesome6-Solid.otf"
+    }
 
     Rectangle {
         id: titleBar
@@ -202,10 +206,9 @@ ApplicationWindow {
 
                 Repeater {
                     model: [
-                        { name: "Home", icon: "🏠", page: 0 },
-                        { name: "Timer", icon: "⏱", page: 1 },
-                        { name: "Tasks", icon: "✓", page: 2 },
-                        { name: "Settings", icon: "⚙", page: 3 }
+                        { name: "Home", icon: Theme.icons.home, page: 0 },
+                        { name: "Projects", icon: Theme.icons.projects, page: 1 },
+                        { name: "Settings", icon: Theme.icons.settings, page: 2 }
                     ]
 
                     Rectangle {
@@ -227,8 +230,8 @@ ApplicationWindow {
                             Text {
                                 text: modelData.icon
                                 color: currentPage === modelData.page ? "white" : Theme.colors.textSecondary
-                                font.pixelSize: 20
-                                font.family: Theme.fontFamily
+                                font.pixelSize: 18
+                                font.family: Theme.iconFontFamily
                             }
 
                             Text {
@@ -253,37 +256,6 @@ ApplicationWindow {
                 }
 
                 Item { Layout.fillHeight: true }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 80
-                    radius: Theme.radius.md
-                    color: Theme.colors.card
-                    border.color: Theme.colors.cardBorder
-                    border.width: 1
-
-                    ColumnLayout {
-                        anchors.centerIn: parent
-                        spacing: Theme.spacing.xs
-
-                        Text {
-                            text: TimerBackend.getCompletedSessions().toString()
-                            color: Theme.colors.primary
-                            font.pixelSize: 28
-                            font.bold: true
-                            font.family: Theme.fontFamily
-                            Layout.alignment: Qt.AlignHCenter
-                        }
-
-                        Text {
-                            text: "Sessions Today"
-                            color: Theme.colors.textSecondary
-                            font.pixelSize: Theme.typography.caption
-                            font.family: Theme.fontFamily
-                            Layout.alignment: Qt.AlignHCenter
-                        }
-                    }
-                }
             }
         }
 
@@ -294,22 +266,9 @@ ApplicationWindow {
 
             DashboardPage {}
 
-            TimerPage {
-                onSessionChanged: function(session) {
-                    root.currentSession = session
-                }
-            }
-
-            TasksPage {}
+            ProjectsPage {}
 
             SettingsPage {}
-        }
-    }
-
-    Connections {
-        target: TimerBackend
-        function onSessionChanged(session) {
-            root.currentSession = session
         }
     }
 }
