@@ -12,9 +12,9 @@ Rectangle {
     border.color: Theme.getSessionColor(TimerBackend.sessionType)
     border.width: 1
 
-    property bool isRunning: TimerBackend.isRunning
-    property int timeRemaining: TimerBackend.timeRemaining
-    property string sessionType: TimerBackend.sessionType
+    property bool isRunning: TimerBackend.isRunning ?? false
+    property int timeRemaining: TimerBackend.timeRemaining ?? 0
+    property string sessionType: TimerBackend.sessionType ?? "work"
 
     DragHandler {
         id: dragHandler

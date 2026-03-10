@@ -258,3 +258,4 @@ you need to follow those rules strictly
 - we will use QML for the UI, so be creative 
 - always you must ensure the Brand Consistency 
 - try to use animation on all UI elements 
+- always use `notify-send` after the completion of each task 

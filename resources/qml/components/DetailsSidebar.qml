@@ -137,11 +137,11 @@ Rectangle {
             }
         }
 
-        // Tags Section (if any)
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Theme.spacing.md
-            visible: root.projectData.tags && root.projectData.tags.length > 0
+    // Tags Section (if any)
+    ColumnLayout {
+        Layout.fillWidth: true
+        spacing: Theme.spacing.md
+        visible: !!root.projectData && !!root.projectData.tags && root.projectData.tags.length > 0
 
             Text {
                 text: "TAGS"
