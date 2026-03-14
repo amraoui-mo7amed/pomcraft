@@ -14,7 +14,6 @@ from src.markdown_renderer import MarkdownRenderer
 
 def main() -> int:
     app = QGuiApplication(sys.argv)
-    # ... setup app ...
     app.setApplicationName("Pomcraft")
     app.setApplicationDisplayName("Pomcraft")
     app.setOrganizationName("Pomcraft")
@@ -31,9 +30,21 @@ def main() -> int:
     project_tasks_backend = ProjectTasksBackend()
     markdown_renderer = MarkdownRenderer()
 
-    timer_backend.setWorkDuration(settings_backend.getWorkDuration())
-    timer_backend.setShortBreakDuration(settings_backend.getShortBreakDuration())
-    timer_backend.setLongBreakDuration(settings_backend.getLongBreakDuration())
+    # Initial sync
+    timer_backend.setWorkDuration(settings_backend.workDuration)
+    timer_backend.setShortBreakDuration(settings_backend.shortBreakDuration)
+    timer_backend.setLongBreakDuration(settings_backend.longBreakDuration)
+
+    # Reactive sync
+    settings_backend.workDurationChanged.connect(
+        lambda: timer_backend.setWorkDuration(settings_backend.workDuration)
+    )
+    settings_backend.shortBreakDurationChanged.connect(
+        lambda: timer_backend.setShortBreakDuration(settings_backend.shortBreakDuration)
+    )
+    settings_backend.longBreakDurationChanged.connect(
+        lambda: timer_backend.setLongBreakDuration(settings_backend.longBreakDuration)
+    )
 
     engine.rootContext().setContextProperty("TimerBackend", timer_backend)
     engine.rootContext().setContextProperty("TasksBackend", tasks_backend)
@@ -44,7 +55,6 @@ def main() -> int:
     )
     engine.rootContext().setContextProperty("MarkdownRenderer", markdown_renderer)
 
-    # Register helper for QML to apply syntax highlighter
     class HighlighterBridge(QObject):
         def __init__(self):
             super().__init__()

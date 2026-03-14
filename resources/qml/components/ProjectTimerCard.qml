@@ -7,14 +7,14 @@ Rectangle {
     id: root
     Layout.fillWidth: true
     height: 160
-    radius: 7
+    radius: Theme.radius.md
     color: Theme.colors.surface
-    border.color: Theme.getSessionColor(TimerBackend.sessionType)
+    border.color: Theme.getSessionColor(root.sessionType)
     border.width: 1
 
-    property bool isRunning: TimerBackend.isRunning ?? false
-    property int timeRemaining: TimerBackend.timeRemaining ?? 0
-    property string sessionType: TimerBackend.sessionType ?? "work"
+    property bool isRunning: TimerBackend.isRunning
+    property int timeRemaining: TimerBackend.timeRemaining
+    property string sessionType: TimerBackend.sessionType
 
     ColumnLayout {
         anchors.fill: parent
@@ -62,7 +62,7 @@ Rectangle {
             }
 
             Text {
-                text: "#" + (TimerBackend.getCompletedSessions() + 1)
+                text: "#" + (TimerBackend.completedSessions + 1)
                 color: Theme.colors.textMuted
                 font.pixelSize: 10
                 font.family: Theme.fontFamily

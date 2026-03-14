@@ -7,6 +7,18 @@ import "../components"
 Item {
     id: root
 
+    property int tempWorkDuration: SettingsBackend.workDuration
+    property int tempShortBreak: SettingsBackend.shortBreakDuration
+    property int tempLongBreak: SettingsBackend.longBreakDuration
+
+    // Sync temp values when backend changes (e.g. on first load or external update)
+    Connections {
+        target: SettingsBackend
+        function onWorkDurationChanged() { root.tempWorkDuration = SettingsBackend.workDuration }
+        function onShortBreakDurationChanged() { root.tempShortBreak = SettingsBackend.shortBreakDuration }
+        function onLongBreakDurationChanged() { root.tempLongBreak = SettingsBackend.longBreakDuration }
+    }
+
     Rectangle {
         anchors.fill: parent
         color: Theme.colors.background
@@ -36,41 +48,41 @@ Item {
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: Theme.spacing.md
+                    spacing: Theme.spacing.lg
 
                     SettingsSlider {
                         Layout.fillWidth: true
                         label: "Work Duration"
-                        value: SettingsBackend.workDuration
+                        value: root.tempWorkDuration
                         from: 1
                         to: 60
                         suffix: " min"
                         onSliderValueChanged: function (newValue) {
-                            SettingsBackend.workDuration = newValue;
+                            root.tempWorkDuration = newValue;
                         }
                     }
 
                     SettingsSlider {
                         Layout.fillWidth: true
                         label: "Short Break"
-                        value: SettingsBackend.shortBreakDuration
+                        value: root.tempShortBreak
                         from: 1
                         to: 30
                         suffix: " min"
                         onSliderValueChanged: function (newValue) {
-                            SettingsBackend.shortBreakDuration = newValue;
+                            root.tempShortBreak = newValue;
                         }
                     }
 
                     SettingsSlider {
                         Layout.fillWidth: true
                         label: "Long Break"
-                        value: SettingsBackend.longBreakDuration
+                        value: root.tempLongBreak
                         from: 5
                         to: 60
                         suffix: " min"
                         onSliderValueChanged: function (newValue) {
-                            SettingsBackend.longBreakDuration = newValue;
+                            root.tempLongBreak = newValue;
                         }
                     }
                 }
