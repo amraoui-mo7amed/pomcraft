@@ -1,5 +1,3 @@
-"""Pomcraft - Project management with Markdown support."""
-
 import sys
 from pathlib import Path
 
@@ -9,6 +7,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from src.backend import TimerBackend, TasksBackend, SettingsBackend, ProjectsBackend
+from src.project_tasks import ProjectTasksBackend
 from src.highlighter import MarkdownHighlighter
 from src.markdown_renderer import MarkdownRenderer
 
@@ -29,6 +28,7 @@ def main() -> int:
     tasks_backend = TasksBackend()
     settings_backend = SettingsBackend()
     projects_backend = ProjectsBackend()
+    project_tasks_backend = ProjectTasksBackend()
     markdown_renderer = MarkdownRenderer()
 
     timer_backend.setWorkDuration(settings_backend.getWorkDuration())
@@ -39,6 +39,9 @@ def main() -> int:
     engine.rootContext().setContextProperty("TasksBackend", tasks_backend)
     engine.rootContext().setContextProperty("SettingsBackend", settings_backend)
     engine.rootContext().setContextProperty("ProjectsBackend", projects_backend)
+    engine.rootContext().setContextProperty(
+        "ProjectTasksBackend", project_tasks_backend
+    )
     engine.rootContext().setContextProperty("MarkdownRenderer", markdown_renderer)
 
     # Register helper for QML to apply syntax highlighter

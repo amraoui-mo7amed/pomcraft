@@ -16,17 +16,6 @@ Rectangle {
     property int timeRemaining: TimerBackend.timeRemaining ?? 0
     property string sessionType: TimerBackend.sessionType ?? "work"
 
-    DragHandler {
-        id: dragHandler
-        target: root
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        cursorShape: Qt.SizeAllCursor
-        acceptedButtons: Qt.NoButton
-    }
-
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Theme.spacing.md

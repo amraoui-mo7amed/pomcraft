@@ -7,29 +7,28 @@ Rectangle {
     id: root
 
     property var projectData: ({})
+    property var projectTasks: []
     visible: false
 
-    // Scale and opacity animations for "window" effect
     opacity: visible ? 1 : 0
-    scale: visible ? 1 : 0.95
+    scale: visible ? 1 : 0.98
     Behavior on opacity {
         NumberAnimation {
-            duration: 250
+            duration: 200
             easing.type: Easing.OutCubic
         }
     }
     Behavior on scale {
         NumberAnimation {
-            duration: 300
+            duration: 250
             easing.type: Easing.OutBack
         }
     }
 
     anchors.fill: parent
-    color: Qt.rgba(Theme.colors.background.r, Theme.colors.background.g, Theme.colors.background.b, 0.95)
+    color: Theme.colors.background // Changed to solid background to fix mess
     z: 1000
 
-    // Prevent clicking through to the main window
     MouseArea {
         anchors.fill: parent
         onClicked: {}
@@ -37,8 +36,8 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Theme.spacing.xxl
-        spacing: Theme.spacing.xl
+        anchors.margins: Theme.spacing.xl
+        spacing: Theme.spacing.lg
 
         // Header
         RowLayout {
@@ -46,18 +45,18 @@ Rectangle {
             spacing: Theme.spacing.xl
 
             ColumnLayout {
-                spacing: 4
+                spacing: 2
                 Text {
                     text: root.projectData.title || ""
                     color: Theme.colors.text
-                    font.pixelSize: 32
+                    font.pixelSize: 28
                     font.bold: true
                     font.family: Theme.fontFamily
                 }
                 Text {
                     text: (root.projectData.headline || "Project Workspace") + " • " + (root.projectData.client_name || "Internal")
                     color: Theme.colors.primary
-                    font.pixelSize: 14
+                    font.pixelSize: 13
                     font.weight: Font.Medium
                 }
             }
@@ -68,9 +67,9 @@ Rectangle {
 
             // Tab Switcher
             Rectangle {
-                height: 44
-                width: 240
-                radius: 22
+                height: 40
+                width: 180
+                radius: 20
                 color: Theme.colors.surface
                 border.width: 1
                 border.color: Theme.colors.divider
@@ -84,21 +83,15 @@ Rectangle {
                         Rectangle {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
-                            radius: 22
+                            radius: 20
                             color: tabStack.currentIndex === index ? Theme.colors.primary : "transparent"
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 200
-                                }
-                            }
 
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData
                                 color: tabStack.currentIndex === index ? "white" : Theme.colors.textSecondary
                                 font.bold: tabStack.currentIndex === index
-                                font.pixelSize: 13
+                                font.pixelSize: 12
                             }
 
                             MouseArea {
@@ -113,9 +106,9 @@ Rectangle {
 
             // Close Button
             Rectangle {
-                width: 44
-                height: 44
-                radius: 22
+                width: 36
+                height: 36
+                radius: 18
                 color: closeHover.containsMouse ? Theme.colors.error : Theme.colors.surface
 
                 Text {
@@ -123,7 +116,7 @@ Rectangle {
                     text: Theme.icons.close
                     font.family: Theme.iconFontFamily
                     color: closeHover.containsMouse ? "white" : Theme.colors.text
-                    font.pixelSize: 16
+                    font.pixelSize: 14
                 }
 
                 MouseArea {
@@ -135,83 +128,185 @@ Rectangle {
             }
         }
 
-        // Main Content Area
+        // Content Area
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: Theme.spacing.xl
+            spacing: Theme.spacing.lg
 
-            // Editor / Preview Section (Left)
             StackLayout {
                 id: tabStack
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 currentIndex: 0
 
-                // Details Tab
                 MarkdownWorkspace {
                     text: root.projectData.details_markdown || ""
-                    placeholder: "# Project Details\nAdd goals, resources, and notes here..."
+                    placeholder: "# Project README\nAdd goals, resources, and notes here..."
                     onContentUpdated: newText => {
                         ProjectsBackend.updateProjectMarkdown(root.projectData.id, "details", newText);
                     }
                 }
 
-                // Tasks Tab
-                MarkdownWorkspace {
-                    text: root.projectData.tasks_markdown || ""
-                    placeholder: "# Project Tasks\n- [ ] Task 1\n- [ ] Task 2\n- [x] Completed task"
-                    onContentUpdated: newText => {
-                        ProjectsBackend.updateProjectMarkdown(root.projectData.id, "tasks", newText);
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    spacing: Theme.spacing.md
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text {
+                            text: "Project Tasks (" + root.projectTasks.length + ")"
+                            color: Theme.colors.text
+                            font.pixelSize: 18
+                            font.bold: true
+                            font.family: Theme.fontFamily
+                        }
+                        Item {
+                            Layout.fillWidth: true
+                        }
+                        Rectangle {
+                            height: 32
+                            width: 100
+                            radius: 16
+                            color: addTaskArea.containsMouse ? Theme.colors.primaryHover : Theme.colors.primary
+                            Text {
+                                anchors.centerIn: parent
+                                text: "+ Add Task"
+                                color: "white"
+                                font.pixelSize: 12
+                                font.bold: true
+                            }
+                            MouseArea {
+                                id: addTaskArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: addTaskPopup.visible = true
+                            }
+                        }
+                    }
+
+                    ScrollView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        clip: true
+                        ScrollBar.vertical.policy: ScrollBar.AsNeeded
+
+                        ColumnLayout {
+                            width: parent.width - 20
+                            spacing: Theme.spacing.sm
+
+                            Repeater {
+                                model: root.projectTasks
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    height: 50
+                                    radius: 8
+                                    color: Theme.colors.surface
+                                    border.color: Theme.colors.divider
+                                    border.width: 1
+
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.margins: Theme.spacing.md
+                                        spacing: Theme.spacing.md
+
+                                        Rectangle {
+                                            width: 20
+                                            height: 20
+                                            radius: 4
+                                            color: modelData.completed ? Theme.colors.success : "transparent"
+                                            border.color: modelData.completed ? Theme.colors.success : Theme.colors.textMuted
+                                            border.width: 2
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: modelData.completed ? Theme.icons.check : ""
+                                                font.family: Theme.iconFontFamily
+                                                color: "white"
+                                                font.pixelSize: 10
+                                            }
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: ProjectTasksBackend.toggleTask(modelData.id)
+                                            }
+                                        }
+
+                                        Text {
+                                            Layout.fillWidth: true
+                                            text: modelData.title
+                                            color: modelData.completed ? Theme.colors.textMuted : Theme.colors.text
+                                            font.pixelSize: 14
+                                            font.strikeout: modelData.completed
+                                            elide: Text.ElideRight
+                                        }
+
+                                        MouseArea {
+                                            width: 24
+                                            height: 24
+                                            cursorShape: Qt.PointingHandCursor
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: Theme.icons.trash
+                                                font.family: Theme.iconFontFamily
+                                                color: parent.containsMouse ? Theme.colors.error : Theme.colors.textMuted
+                                                font.pixelSize: 14
+                                            }
+                                            onClicked: ProjectTasksBackend.deleteTask(modelData.id)
+                                        }
+                                    }
+                                }
+                            }
+
+                            Item {
+                                visible: root.projectTasks.length === 0
+                                Layout.fillWidth: true
+                                height: 200
+                                Column {
+                                    anchors.centerIn: parent
+                                    spacing: 10
+                                    Text {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        text: Theme.icons.tasks
+                                        font.family: Theme.iconFontFamily
+                                        font.pixelSize: 48
+                                        color: Theme.colors.textMuted
+                                        opacity: 0.3
+                                    }
+                                    Text {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        text: "Click '+ Add Task' to create one!"
+                                        color: Theme.colors.textMuted
+                                        font.pixelSize: 14
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
 
-            // Sidebar Area (Right)
+            // Sidebar
             ScrollView {
-                id: sidebarScroll
-                Layout.preferredWidth: 320
+                Layout.preferredWidth: 300
                 Layout.fillHeight: true
                 clip: true
                 ScrollBar.vertical.policy: ScrollBar.AsNeeded
-                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
 
                 ColumnLayout {
-                    width: sidebarScroll.availableWidth
+                    width: parent.width - 20
                     spacing: Theme.spacing.lg
 
-                    // Project Details Card
                     DetailsSidebar {
-                        id: detailsSidebar
                         projectData: root.projectData
                         Layout.fillWidth: true
-                        Layout.preferredHeight: implicitHeight
-                    }
-                }
-
-                // Entrance animation
-                property real translateX: root.visible ? 0 : 40
-                opacity: root.visible ? 1 : 0
-                transform: Translate {
-                    x: sidebarScroll.translateX
-                }
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: 400
-                        easing.type: Easing.OutCubic
-                    }
-                }
-                Behavior on translateX {
-                    NumberAnimation {
-                        duration: 500
-                        easing.type: Easing.OutBack
                     }
                 }
             }
         }
 
-        // Footer Stats
+        // Footer
         RowLayout {
             Layout.fillWidth: true
             Text {
@@ -223,21 +318,135 @@ Rectangle {
                 Layout.fillWidth: true
             }
             Text {
-                text: "Markdown automatically saves as you type"
+                text: root.projectTasks.length + " task" + (root.projectTasks.length !== 1 ? "s" : "")
                 color: Theme.colors.primary
                 font.pixelSize: 11
-                font.italic: true
-                opacity: 0.7
             }
         }
     }
 
-    // Floating Timer Card
-    ProjectTimerCard {
-        id: projectTimer
-        width: 320
-        x: root.width - width - Theme.spacing.xxl
-        y: root.height - height - Theme.spacing.xxl - 40
-        z: 2000
+    // Modal
+    Rectangle {
+        id: addTaskPopup
+        anchors.fill: parent
+        visible: false
+        color: Qt.rgba(0, 0, 0, 0.7)
+        z: 3000
+
+        MouseArea {
+            anchors.fill: parent
+        }
+
+        Rectangle {
+            width: 440
+            height: 200
+            radius: 16
+            color: Theme.colors.surface
+            anchors.centerIn: parent
+            border.color: Theme.colors.divider
+
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 24
+                spacing: 20
+
+                Text {
+                    text: "Add New Task"
+                    color: Theme.colors.text
+                    font.pixelSize: 20
+                    font.bold: true
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 48
+                    radius: 8
+                    color: Theme.colors.background
+                    border.color: taskIn.activeFocus ? Theme.colors.primary : Theme.colors.divider
+
+                    TextInput {
+                        id: taskIn
+                        anchors.fill: parent
+                        anchors.margins: 12
+                        verticalAlignment: TextInput.AlignVCenter
+                        color: Theme.colors.text
+                        font.pixelSize: 14
+                        focus: addTaskPopup.visible
+
+                        Text {
+                            text: "Enter task title..."
+                            color: Theme.colors.textMuted
+                            visible: !parent.text && !parent.activeFocus
+                            anchors.fill: parent
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 12
+                    Item {
+                        Layout.fillWidth: true
+                    }
+
+                    Rectangle {
+                        height: 36
+                        width: 80
+                        radius: 8
+                        color: Theme.colors.surfaceActive
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Cancel"
+                            color: Theme.colors.textSecondary
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: addTaskPopup.visible = false
+                            cursorShape: Qt.PointingHandCursor
+                        }
+                    }
+
+                    Rectangle {
+                        height: 36
+                        width: 80
+                        radius: 8
+                        color: Theme.colors.primary
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Add"
+                            color: "white"
+                            font.bold: true
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (taskIn.text.trim()) {
+                                    ProjectTasksBackend.addTask(root.projectData.id, taskIn.text.trim());
+                                    taskIn.text = "";
+                                    addTaskPopup.visible = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    onProjectDataChanged: {
+        if (projectData && projectData.id) {
+            root.projectTasks = ProjectTasksBackend.getProjectTasks(projectData.id);
+        }
+    }
+
+    Connections {
+        target: ProjectTasksBackend
+        function onProjectTasksChanged(projectId) {
+            if (root.projectData && root.projectData.id === projectId) {
+                root.projectTasks = ProjectTasksBackend.getProjectTasks(projectId);
+            }
+        }
     }
 }

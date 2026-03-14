@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Window 2.15
 import "pages"
+import "components"
 
 ApplicationWindow {
     id: root
@@ -283,6 +284,13 @@ ApplicationWindow {
 
                 Item {
                     Layout.fillHeight: true
+                }
+
+                // Timer Card at bottom of sidebar
+                ProjectTimerCard {
+                    id: projectTimer
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 160
                 }
             }
         }

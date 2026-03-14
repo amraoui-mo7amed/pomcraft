@@ -261,3 +261,4 @@ you need to follow those rules strictly
 - try to use animation on all UI elements 
 - always use `notify-send` to inform me about the completion of each task
 - always run the app for testing after each task 
+- always use font-awsome icons instead of random ones 

@@ -24,10 +24,8 @@ Item {
         // Header
         RowLayout {
             Layout.fillWidth: true
-            spacing: Theme.spacing.md
 
             ColumnLayout {
-                spacing: 2
                 Text {
                     text: "Projects"
                     color: Theme.colors.text
@@ -48,14 +46,12 @@ Item {
             // Filter buttons
             RowLayout {
                 spacing: Theme.spacing.sm
-
                 Repeater {
                     model: [
                         { name: "All", filter: "all" },
                         { name: "Active", filter: "active" },
                         { name: "Completed", filter: "completed" }
                     ]
-
                     Rectangle {
                         height: 36
                         width: filterText.implicitWidth + 30
@@ -63,7 +59,6 @@ Item {
                         color: root.currentFilter === modelData.filter ? Theme.colors.primary : Theme.colors.surface
                         border.color: root.currentFilter === modelData.filter ? Theme.colors.primary : Theme.colors.divider
                         border.width: 1
-
                         Text {
                             id: filterText
                             anchors.centerIn: parent
@@ -73,7 +68,6 @@ Item {
                             font.bold: root.currentFilter === modelData.filter
                             font.family: Theme.fontFamily
                         }
-
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -85,56 +79,94 @@ Item {
 
             // Add project button
             Rectangle {
-                width: 40; height: 40; radius: 20
+                width: 40
+                height: 40
+                radius: 20
                 color: addBtn.containsMouse ? Theme.colors.primaryHover : Theme.colors.primary
                 Text {
                     anchors.centerIn: parent
-                    text: Theme.icons.plus; font.family: Theme.iconFontFamily; color: "white"; font.pixelSize: 16
+                    text: Theme.icons.plus
+                    font.family: Theme.iconFontFamily
+                    color: "white"
+                    font.pixelSize: 16
                 }
                 MouseArea {
-                    id: addBtn; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                    onClicked: { projectDialog.projectData = {}; projectDialog.visible = true }
+                    id: addBtn
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        projectDialog.projectData = {}
+                        projectDialog.visible = true
+                    }
                 }
             }
         }
 
-        // Project List
-        ListView {
-            id: projectList
+        // Projects Grid - 2 columns
+        ScrollView {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            spacing: Theme.spacing.md
-            model: {
-                if (root.currentFilter === "all") return root.projects;
-                return root.projects.filter(p => p.status === root.currentFilter);
-            }
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
-            delegate: ProjectCard {
-                projectData: modelData
-                onOpenProject: function(projectId) {
-                    projectView.projectData = ProjectsBackend.getProject(projectId)
-                    projectView.visible = true
-                }
-                onDeleteProject: function(projectId) {
-                    ProjectsBackend.deleteProject(projectId)
-                }
-            }
-
-            // Empty state
             ColumnLayout {
-                anchors.centerIn: parent
-                visible: projectList.count === 0
+                width: parent.width - 20
                 spacing: Theme.spacing.md
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "📁"; font.pixelSize: 48; opacity: 0.2
+
+                // Row of 2 cards
+                RowLayout {
+                    width: parent.width
+                    spacing: Theme.spacing.md
+
+                    property int index: 0
+
+                    Repeater {
+                        model: root.projects
+                        ProjectCard {
+                            Layout.preferredWidth: (root.width - Theme.spacing.xl * 2 - Theme.spacing.md) / 2
+                            Layout.minimumHeight: 220
+                            Layout.maximumHeight: 220
+                            projectData: modelData
+                            onOpenProject: function(projectId) {
+                                projectView.projectData = ProjectsBackend.getProject(projectId)
+                                projectView.visible = true
+                            }
+                            onDeleteProject: function(projectId) {
+                                ProjectsBackend.deleteProject(projectId)
+                            }
+                        }
+                    }
                 }
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: "No " + (root.currentFilter !== "all" ? root.currentFilter + " " : "") + "projects found."
-                    color: Theme.colors.textMuted; font.pixelSize: 16; font.family: Theme.fontFamily
-                }
+            }
+        }
+    }
+
+    // Empty state
+    Rectangle {
+        anchors.fill: parent
+        visible: root.projects.length === 0
+        color: "transparent"
+
+        Column {
+            anchors.centerIn: parent
+            spacing: Theme.spacing.md
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: Theme.icons.projects
+                font.family: Theme.iconFontFamily
+                font.pixelSize: 64
+                color: Theme.colors.textMuted
+                opacity: 0.4
+            }
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "No projects found. Create one to get started!"
+                color: Theme.colors.textMuted
+                font.pixelSize: 16
+                font.family: Theme.fontFamily
             }
         }
     }
@@ -142,15 +174,19 @@ Item {
     ProjectDetailDialog {
         id: projectDialog
         anchors.centerIn: parent
+        visible: false
         onProjectSaved: root.projects = ProjectsBackend.getProjects()
     }
 
     ProjectViewDialog {
         id: projectView
+        visible: false
     }
 
     Connections {
         target: ProjectsBackend
-        function onProjectsChanged() { root.projects = ProjectsBackend.getProjects() }
+        function onProjectsChanged() {
+            root.projects = ProjectsBackend.getProjects()
+        }
     }
 }
