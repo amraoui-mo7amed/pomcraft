@@ -199,7 +199,7 @@ ApplicationWindow {
 
         Rectangle {
             id: sidebar
-            implicitWidth: 220
+            implicitWidth: 260
             Layout.fillHeight: true
             color: Theme.colors.surface
 
