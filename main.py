@@ -35,8 +35,9 @@ def main() -> int:
     timer_backend.setWorkDuration(settings_backend.workDuration)
     timer_backend.setShortBreakDuration(settings_backend.shortBreakDuration)
     timer_backend.setLongBreakDuration(settings_backend.longBreakDuration)
+    timer_backend.set_settings_backend(settings_backend)
 
-    # Reactive sync
+    # Reactive sync for timer settings
     settings_backend.workDurationChanged.connect(
         lambda: timer_backend.setWorkDuration(settings_backend.workDuration)
     )
@@ -45,6 +46,11 @@ def main() -> int:
     )
     settings_backend.longBreakDurationChanged.connect(
         lambda: timer_backend.setLongBreakDuration(settings_backend.longBreakDuration)
+    )
+    settings_backend.notificationSoundChanged.connect(
+        lambda: timer_backend.set_notification_sound_enabled(
+            settings_backend.notificationSound
+        )
     )
 
     engine.rootContext().setContextProperty("TimerBackend", timer_backend)

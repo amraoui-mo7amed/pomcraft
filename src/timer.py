@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Optional
 
 from PySide6.QtCore import QObject, QTimer, Signal, Slot, Property
+from PySide6.QtMultimedia import QSoundEffect
+from PySide6.QtCore import QUrl
 
 
 class TimerBackend(QObject):
@@ -26,6 +28,8 @@ class TimerBackend(QObject):
         self._short_break_duration = 5 * 60
         self._long_break_duration = 15 * 60
         self._sessions_until_long_break = 4
+        self._notification_sound_enabled = True
+        self._settings_backend = None
 
         self._remaining_seconds = self._work_duration
         self._total_seconds = self._work_duration
@@ -35,6 +39,27 @@ class TimerBackend(QObject):
 
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._tick)
+
+        # Load sound effect
+        sound_path = (
+            Path(__file__).parent.parent / "resources" / "sounds" / "notification.wav"
+        )
+        if sound_path.exists():
+            self._sound = QSoundEffect(self)
+            self._sound.setSource(QUrl.fromLocalFile(str(sound_path)))
+            self._sound.setVolume(0.8)
+        else:
+            self._sound = None
+
+    def set_settings_backend(self, settings_backend) -> None:
+        """Set the settings backend to check notification sound preference."""
+        self._settings_backend = settings_backend
+        if settings_backend:
+            self._notification_sound_enabled = settings_backend.notificationSound
+
+    def set_notification_sound_enabled(self, enabled: bool) -> None:
+        """Enable or disable notification sound."""
+        self._notification_sound_enabled = enabled
 
     def _tick(self) -> None:
         if self._remaining_seconds > 0:
@@ -48,6 +73,10 @@ class TimerBackend(QObject):
         self._is_running = False
         self.isRunningChanged.emit()
         self.stateChanged.emit("stopped")
+
+        # Play sound notification
+        if self._notification_sound_enabled and self._sound:
+            self._sound.play()
 
         # Desktop Notification
         try:
