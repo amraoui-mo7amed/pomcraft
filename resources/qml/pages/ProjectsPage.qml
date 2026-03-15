@@ -126,34 +126,25 @@ Item {
             clip: true
             ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
-            ColumnLayout {
-                width: parent.width - 20
-                spacing: Theme.spacing.md
+            GridLayout {
+                width: parent.width - 40
+                columns: 2
+                rowSpacing: Theme.spacing.md
+                columnSpacing: Theme.spacing.md
 
                 Repeater {
-                    model: Math.ceil(root.projects.length / 2)
-
-                    RowLayout {
-                        width: parent.width
-                        spacing: Theme.spacing.md
-
-                        Repeater {
-                            model: 2
-                            property int rowIndex: index
-
-                            ProjectCard {
-                                width: (root.width - Theme.spacing.xl * 2 - Theme.spacing.md) / 2
-                                height: 220
-                                visible: (root.projects.length > rowIndex * 2 + modelData)
-                                projectData: root.projects[rowIndex * 2 + modelData]
-                                onOpenProject: function(projectId) {
-                                    projectView.projectData = ProjectsBackend.getProject(projectId)
-                                    projectView.visible = true
-                                }
-                                onDeleteProject: function(projectId) {
-                                    ProjectsBackend.deleteProject(projectId)
-                                }
-                            }
+                    model: root.projects
+                    ProjectCard {
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 220
+                        Layout.preferredHeight: 220
+                        projectData: modelData
+                        onOpenProject: function(projectId) {
+                            projectView.projectData = ProjectsBackend.getProject(projectId)
+                            projectView.visible = true
+                        }
+                        onDeleteProject: function(projectId) {
+                            ProjectsBackend.deleteProject(projectId)
                         }
                     }
                 }
