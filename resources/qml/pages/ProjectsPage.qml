@@ -8,8 +8,21 @@ import "../components"
 Item {
     id: root
 
-    property var projects: ProjectsBackend.getProjects()
+    property var allProjects: ProjectsBackend.getProjects()
+    property var projects: {
+        var filtered = [];
+        for (var i = 0; i < allProjects.length; i++) {
+            if (root.currentFilter === "all" || allProjects[i].status === root.currentFilter) {
+                filtered.push(allProjects[i]);
+            }
+        }
+        return filtered;
+    }
     property string currentFilter: "all"
+
+    onAllProjectsChanged: {
+        // Trigger recalculation of filtered projects
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -71,7 +84,10 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: root.currentFilter = modelData.filter
+                            onClicked: {
+                                root.currentFilter = modelData.filter
+                                root.allProjects = ProjectsBackend.getProjects()
+                            }
                         }
                     }
                 }
@@ -114,26 +130,29 @@ Item {
                 width: parent.width - 20
                 spacing: Theme.spacing.md
 
-                // Row of 2 cards
-                RowLayout {
-                    width: parent.width
-                    spacing: Theme.spacing.md
+                Repeater {
+                    model: Math.ceil(root.projects.length / 2)
 
-                    property int index: 0
+                    RowLayout {
+                        width: parent.width
+                        spacing: Theme.spacing.md
 
-                    Repeater {
-                        model: root.projects
-                        ProjectCard {
-                            Layout.preferredWidth: (root.width - Theme.spacing.xl * 2 - Theme.spacing.md) / 2
-                            Layout.minimumHeight: 220
-                            Layout.maximumHeight: 220
-                            projectData: modelData
-                            onOpenProject: function(projectId) {
-                                projectView.projectData = ProjectsBackend.getProject(projectId)
-                                projectView.visible = true
-                            }
-                            onDeleteProject: function(projectId) {
-                                ProjectsBackend.deleteProject(projectId)
+                        Repeater {
+                            model: 2
+                            property int rowIndex: index
+
+                            ProjectCard {
+                                width: (root.width - Theme.spacing.xl * 2 - Theme.spacing.md) / 2
+                                height: 220
+                                visible: (root.projects.length > rowIndex * 2 + modelData)
+                                projectData: root.projects[rowIndex * 2 + modelData]
+                                onOpenProject: function(projectId) {
+                                    projectView.projectData = ProjectsBackend.getProject(projectId)
+                                    projectView.visible = true
+                                }
+                                onDeleteProject: function(projectId) {
+                                    ProjectsBackend.deleteProject(projectId)
+                                }
                             }
                         }
                     }
@@ -186,7 +205,7 @@ Item {
     Connections {
         target: ProjectsBackend
         function onProjectsChanged() {
-            root.projects = ProjectsBackend.getProjects()
+            root.allProjects = ProjectsBackend.getProjects()
         }
     }
 }

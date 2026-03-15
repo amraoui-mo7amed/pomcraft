@@ -126,7 +126,7 @@ Item {
                         ColumnLayout {
                             spacing: 2
                             Text {
-                                text: ProjectsBackend.getProjectCount().toString()
+                                text: ProjectsBackend.totalCount.toString()
                                 color: Theme.colors.text
                                 font.pixelSize: 34
                                 font.bold: true
@@ -176,7 +176,7 @@ Item {
                         ColumnLayout {
                             spacing: 2
                             Text {
-                                text: ProjectsBackend.getProjectCountByStatus("active").toString()
+                                text: ProjectsBackend.activeCount.toString()
                                 color: Theme.colors.primary
                                 font.pixelSize: 34
                                 font.bold: true
@@ -226,7 +226,7 @@ Item {
                         ColumnLayout {
                             spacing: 2
                             Text {
-                                text: ProjectsBackend.getProjectCountByStatus("completed").toString()
+                                text: ProjectsBackend.completedCount.toString()
                                 color: Theme.colors.success
                                 font.pixelSize: 34
                                 font.bold: true

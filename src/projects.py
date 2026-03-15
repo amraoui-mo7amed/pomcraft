@@ -172,6 +172,11 @@ class ProjectsBackend(QObject):
         finally:
             session.close()
 
+    def _get_total_count(self) -> int:
+        return self.getProjectCount()
+
+    totalCount = Property(int, _get_total_count, notify=projectsChanged)
+
     @Slot(str, result=int)
     def getProjectCountByStatus(self, status: str) -> int:
         """Get project count by status."""
@@ -180,6 +185,16 @@ class ProjectsBackend(QObject):
             return session.query(Project).filter(Project.status == status).count()
         finally:
             session.close()
+
+    def _get_active_count(self) -> int:
+        return self.getProjectCountByStatus("active")
+
+    activeCount = Property(int, _get_active_count, notify=projectsChanged)
+
+    def _get_completed_count(self) -> int:
+        return self.getProjectCountByStatus("completed")
+
+    completedCount = Property(int, _get_completed_count, notify=projectsChanged)
 
     @Slot(result="QVariantList")
     def getActiveProjects(self) -> list[dict[str, Any]]:
