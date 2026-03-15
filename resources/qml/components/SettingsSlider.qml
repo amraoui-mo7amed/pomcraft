@@ -14,6 +14,10 @@ ColumnLayout {
 
     signal sliderValueChanged(real newValue)
 
+    Component.onCompleted: {
+        _lastEmittedValue = Math.round(value)
+    }
+
     spacing: Theme.spacing.sm
 
     RowLayout {
@@ -120,5 +124,5 @@ ColumnLayout {
         }
     }
 
-    property int _lastEmittedValue: Math.round(value)
+    property int _lastEmittedValue
 }

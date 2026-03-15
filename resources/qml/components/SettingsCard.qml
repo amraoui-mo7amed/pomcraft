@@ -9,6 +9,8 @@ Rectangle {
     property string title: ""
     property string icon: ""
     property string description: ""
+    property bool showApply: false
+    signal apply()
 
     default property alias content: contentContainer.children
 
@@ -46,7 +48,6 @@ Rectangle {
             }
 
             ColumnLayout {
-                Layout.fillWidth: true
                 spacing: Theme.spacing.xs
 
                 Text {
@@ -65,6 +66,46 @@ Rectangle {
                     visible: text.length > 0
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            Rectangle {
+                id: applyBtn
+                height: 32
+                width: 80
+                radius: Theme.radius.md
+                color: applyBtnArea.containsMouse ? Theme.colors.primaryHover : Theme.colors.primary
+                visible: root.showApply
+                
+                opacity: visible ? 1 : 0
+                scale: visible ? 1 : 0.8
+
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+                Behavior on scale { NumberAnimation { duration: 250; easing.type: Easing.OutBack } }
+
+                RowLayout {
+                    anchors.centerIn: parent
+                    spacing: 4
+
+                    Text {
+                        text: "Apply"
+                        color: "white"
+                        font.bold: true
+                        font.pixelSize: 11
+                        font.family: Theme.fontFamily
+                    }
+                }
+
+                MouseArea {
+                    id: applyBtnArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.apply()
                 }
             }
         }

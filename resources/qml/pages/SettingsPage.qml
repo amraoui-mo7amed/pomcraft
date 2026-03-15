@@ -10,6 +10,7 @@ Item {
     property int tempWorkDuration: SettingsBackend.workDuration
     property int tempShortBreak: SettingsBackend.shortBreakDuration
     property int tempLongBreak: SettingsBackend.longBreakDuration
+    property string tempApiKey: SettingsBackend.apiKey
 
     // Sync temp values when backend changes (e.g. on first load or external update)
     Connections {
@@ -17,6 +18,7 @@ Item {
         function onWorkDurationChanged() { root.tempWorkDuration = SettingsBackend.workDuration }
         function onShortBreakDurationChanged() { root.tempShortBreak = SettingsBackend.shortBreakDuration }
         function onLongBreakDurationChanged() { root.tempLongBreak = SettingsBackend.longBreakDuration }
+        function onApiKeyChanged() { root.tempApiKey = SettingsBackend.apiKey }
     }
 
     Rectangle {
@@ -45,6 +47,13 @@ Item {
                 title: "Timer"
                 icon: Theme.icons.timer
                 Layout.fillWidth: true
+                showApply: true
+                
+                onApply: {
+                    SettingsBackend.setWorkDuration(root.tempWorkDuration);
+                    SettingsBackend.setShortBreakDuration(root.tempShortBreak);
+                    SettingsBackend.setLongBreakDuration(root.tempLongBreak);
+                }
 
                 ColumnLayout {
                     Layout.fillWidth: true
@@ -93,6 +102,11 @@ Item {
                 title: "Gemini API"
                 icon: Theme.icons.robot
                 description: "Enter your Gemini API key to enable AI-powered insights for your projects."
+                showApply: true
+                
+                onApply: {
+                    SettingsBackend.apiKey = root.tempApiKey;
+                }
 
                 ColumnLayout {
                     Layout.fillWidth: true
@@ -117,14 +131,14 @@ Item {
                             anchors.fill: parent
                             anchors.margins: Theme.spacing.md
                             verticalAlignment: TextInput.AlignVCenter
-                            text: SettingsBackend.apiKey
+                            text: root.tempApiKey
                             color: Theme.colors.text
                             font.pixelSize: Theme.typography.body
                             font.family: Theme.fontFamily
                             echoMode: TextInput.Password
                             selectByMouse: true
 
-                            onTextChanged: SettingsBackend.apiKey = text
+                            onTextChanged: root.tempApiKey = text
                         }
                     }
 
