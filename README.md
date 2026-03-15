@@ -20,22 +20,6 @@ Pomcraft is an open-source, developer-focused Pomodoro timer that integrates Mar
 
 ---
 
-## Screenshots
-
-![Home Dashboard](resources/screenshots/home.png)
-*Dashboard showing project statistics and recent activity*
-
-![Projects View](resources/screenshots/projects.png)
-*Project management with filtering by status*
-
-![Timer](resources/screenshots/timer.png)
-*Pomodoro timer with session tracking*
-
-![Settings](resources/screenshots/settings.png)
-*Customizable timer durations and notification preferences*
-
----
-
 ## Installation
 
 ### Requirements
@@ -85,48 +69,6 @@ pomcraft/
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md
-```
-
----
-
-## Development
-
-### Setup Development Environment
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/pomcraft.git
-cd pomcraft
-
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-# or
-.venv\Scripts\activate      # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### Running Tests
-
-```bash
-pytest
-```
-
-### Building Executable
-
-```bash
-pyinstaller --name="Pomcraft" --windowed main.py
-```
-
-### Code Style
-
-We use Ruff for linting and formatting:
-
-```bash
-ruff check .
-ruff format .
 ```
 
 ---
